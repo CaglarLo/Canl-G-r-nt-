@@ -1,0 +1,69 @@
+
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canlı Görüntü</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: white;
+      text-align: center;
+      padding: 24px;
+    }
+    button {
+      padding: 14px 20px;
+      margin: 8px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    video {
+      width: 100%;
+      max-width: 480px;
+      background: #000;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Canlı Görüntü</h1>
+  <p>Kamera yalnızca sen başlattığında açılır.</p>
+  <button id="start">Kameramı başlat</button>
+  <button id="stop" disabled>Durdur</button>
+  <p id="status">Kamera kapalı.</p>
+  <video id="preview" autoplay playsinline muted></video>
+
+  <script>
+    const preview = document.querySelector("#preview");
+    const status = document.querySelector("#status");
+    let stream = null;
+
+    document.querySelector("#start").onclick = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+        preview.srcObject = stream;
+        status.textContent = "Kamera açık; görüntü bu cihazda gösteriliyor.";
+        document.querySelector("#start").disabled = true;
+        document.querySelector("#stop").disabled = false;
+      } catch {
+        status.textContent = "Kamera izni verilmedi veya kamera açılamadı.";
+      }
+    };
+
+    document.querySelector("#stop").onclick = () => {
+      if (stream) stream.getTracks().forEach(track => track.stop());
+      preview.srcObject = null;
+      stream = null;
+      status.textContent = "Kamera kapalı.";
+      document.querySelector("#start").disabled = false;
+      document.querySelector("#stop").disabled = true;
+    };
+  </script>
+</body>
+</html>
